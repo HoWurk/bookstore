@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class OrderItemServiceImpl implements OrderItemService {
 
-    public static final String GATEWAY_SERVICE_URL = "http://gateway-service:8080";
+    public static final String GATEWAY_SERVICE_URL = "https://gateway-service:8080";
 
     private RestTemplate restTemplate;
 

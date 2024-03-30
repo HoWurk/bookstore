@@ -33,3 +33,10 @@ build/
 .vscode/
 
 .mvn/wrapper/maven-wrapper.jar
+
+.env
+*.p12
+*.crt
+*.pem
+*.pfx
+*.key

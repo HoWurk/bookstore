@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    public static final String GATEWAY_SERVICE_URL = "http://gateway-service:8080";
+    public static final String GATEWAY_SERVICE_URL = "https://gateway-service:8080";
     private RestTemplate restTemplate;
 
     private PaymentRepository paymentRepository;
