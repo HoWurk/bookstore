@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    public static final String WAREHOUSE_SERVICE_URL = "http://app:8080";
+    public static final String GATEWAY_SERVICE_URL = "http://gateway-service:8080";
     private RestTemplate restTemplate;
 
     private OrderRepository orderRepository;
@@ -128,7 +128,7 @@ public class OrderServiceImpl implements OrderService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Map<Long, Integer>> requestEntity = new HttpEntity<>(orderItems, headers);
         ResponseEntity<Boolean> response = restTemplate.exchange(
-                WAREHOUSE_SERVICE_URL + endpoint,
+                GATEWAY_SERVICE_URL + endpoint,
                 HttpMethod.POST,
                 requestEntity,
                 Boolean.class

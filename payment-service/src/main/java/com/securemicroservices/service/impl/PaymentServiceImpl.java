@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    public static final String ORDER_SERVICE_URL = "http://order-service:8080";
+    public static final String GATEWAY_SERVICE_URL = "http://gateway-service:8080";
     private RestTemplate restTemplate;
 
     private PaymentRepository paymentRepository;
@@ -70,9 +70,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void validateOrderExistence(Long orderId) {
-        String orderServiceUrl = "http://order-service:8080";
         try {
-            OrderDTO order = restTemplate.getForObject(orderServiceUrl + "/orders/{orderId}", OrderDTO.class, orderId);
+            OrderDTO order = restTemplate.getForObject(GATEWAY_SERVICE_URL + "/orders/{orderId}", OrderDTO.class, orderId);
         } catch (HttpClientErrorException.NotFound e) {
             throw new NoSuchElementException("Payment Order not found with id: " + orderId);
         }
@@ -132,15 +131,15 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private boolean completeTransaction(Long orderId) {
-        return getConfirmation(ORDER_SERVICE_URL + "/orders/{orderId}/complete", orderId);
+        return getConfirmation(GATEWAY_SERVICE_URL + "/orders/{orderId}/complete", orderId);
     }
 
     private boolean holdItemsInOrder(Long orderId) {
-        return getConfirmation(ORDER_SERVICE_URL + "/orders/{orderId}/hold", orderId);
+        return getConfirmation(GATEWAY_SERVICE_URL + "/orders/{orderId}/hold", orderId);
     }
 
     private boolean releaseItemsInOrder(Long orderId) {
-        return getConfirmation(ORDER_SERVICE_URL + "/orders/{orderId}/release", orderId);
+        return getConfirmation(GATEWAY_SERVICE_URL + "/orders/{orderId}/release", orderId);
     }
 
     /*private boolean validateOrder(Long orderId) {

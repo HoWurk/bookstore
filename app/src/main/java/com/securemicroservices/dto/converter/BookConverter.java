@@ -15,6 +15,7 @@ public class BookConverter {
                 .isbn(book.getIsbn())
                 .price(book.getPrice())
                 .quantityAvailable(book.getQuantityAvailable())
+                .quantityOnHold(book.getQuantityOnHold())
                 .build();
     }
 
@@ -27,6 +28,7 @@ public class BookConverter {
                 .isbn(bookDTO.getIsbn())
                 .price(bookDTO.getPrice())
                 .quantityAvailable(bookDTO.getQuantityAvailable())
+                .quantityOnHold(bookDTO.getQuantityOnHold())
                 .build();
     }
 }

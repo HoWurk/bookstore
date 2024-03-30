@@ -32,6 +32,9 @@ public class BookDTO {
 
     @NotNull(message = "Quantity available must not be null")
     private int quantityAvailable;
+
+    @NotNull(message = "Quantity on hold must not be null")
+    private int quantityOnHold;
 }
 
 

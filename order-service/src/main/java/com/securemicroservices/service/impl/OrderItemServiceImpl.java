@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @Service
 public class OrderItemServiceImpl implements OrderItemService {
 
+    public static final String GATEWAY_SERVICE_URL = "http://gateway-service:8080";
+
     private RestTemplate restTemplate;
 
     private final OrderItemRepository orderItemRepository;
@@ -75,10 +77,8 @@ public class OrderItemServiceImpl implements OrderItemService {
     }*/
 
     private void validateBookQuantity(Long bookId, int requestedQuantity) {
-        String warehouseServiceUrl = "http://app:8080";
-
         try {
-            ResponseEntity<Boolean> response = restTemplate.getForEntity(warehouseServiceUrl + "/books/{bookId}/availability?quantity={quantity}",
+            ResponseEntity<Boolean> response = restTemplate.getForEntity(GATEWAY_SERVICE_URL + "/books/{bookId}/availability?quantity={quantity}",
                     Boolean.class, bookId, requestedQuantity);
 
             if (response.getStatusCode() != HttpStatus.OK) {

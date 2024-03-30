@@ -19,6 +19,7 @@
 		<module>order-service</module>
 		<module>app</module>
 		<module>auth-service</module>
+		<module>gateway</module>
 	</modules>
     <properties>
 		<java.version>17</java.version>
