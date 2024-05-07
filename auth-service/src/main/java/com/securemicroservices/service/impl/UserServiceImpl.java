@@ -6,11 +6,13 @@ import com.securemicroservices.entity.User;
 import com.securemicroservices.repository.UserRepository;
 import com.securemicroservices.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -20,39 +22,49 @@ public class UserServiceImpl implements UserService {
     private UserConverter userConverter;
 
     @Override
-    public UserDTO getUserById(Long userId) {
-        User user = userRepository.findById(userId)
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found with id: " + userId));
-        return userConverter.mapUserToDTO(user);
     }
 
     @Override
-    public List<UserDTO> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
-                .map(userConverter::mapUserToDTO)
-                .collect(Collectors.toList());
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     @Override
-    public UserDTO createUser(UserDTO userDTO) {
+    public User createUser(UserDTO userDTO) {
         User user = userConverter.mapDTOToUser(userDTO);
         user = userRepository.save(user);
-        return userConverter.mapUserToDTO(user);
+        return user;
     }
 
     @Override
-    public UserDTO updateUser(Long userId, UserDTO userDTO) {
+    public User updateUser(Long userId, UserDTO userDTO) {
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found with id: " + userId));
         existingUser.setUsername(userDTO.getUsername());
         existingUser.setPassword(userDTO.getPassword());
         existingUser.setEmail(userDTO.getEmail());
-        return userConverter.mapUserToDTO(userRepository.save(existingUser));
+        return userRepository.save(existingUser);
     }
 
     @Override
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
+    }
+
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    }
+
+    public UserDetailsService userDetailsService() {
+        return this::getByUsername;
+    }
+
+    public User getCurrentUser() {
+        var username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return getByUsername(username);
     }
 }

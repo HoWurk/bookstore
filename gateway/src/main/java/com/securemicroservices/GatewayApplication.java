@@ -13,7 +13,7 @@ public class GatewayApplication {
         return builder.routes()
                 .route("app_route", r -> r.path("/books/**")
                         .uri("http://app:8080"))
-                .route("auth_route", r -> r.path("/auth/**")
+                .route("auth_route", r -> r.path("/auth/**", "/users/**")
                         .uri("http://auth-service:8080"))
                 .route("order_route", r -> r.path("/orders/**").or().path("/order-items/**")
                         .uri("http://order-service:8080"))
