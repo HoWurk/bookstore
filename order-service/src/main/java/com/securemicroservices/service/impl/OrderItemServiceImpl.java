@@ -67,15 +67,6 @@ public class OrderItemServiceImpl implements OrderItemService {
         orderItemRepository.deleteById(orderItemId);
     }
 
-    /*private BookDTO validateBookExistence(Long bookId) {
-        String warehouseServiceUrl = "http://app:8080";
-        try {
-            return restTemplate.getForObject(warehouseServiceUrl + "/books/{bookId}", BookDTO.class, bookId);
-        } catch (HttpClientErrorException.NotFound e) {
-            throw new NoSuchElementException("Book from OrderItem not found with id: " + bookId);
-        }
-    }*/
-
     private void validateBookQuantity(Long bookId, int requestedQuantity) {
         try {
             ResponseEntity<Boolean> response = restTemplate.getForEntity(GATEWAY_SERVICE_URL + "/books/{bookId}/availability?quantity={quantity}",

@@ -20,6 +20,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.Collections;
 
 @Configuration
 public class AppConfig {
@@ -28,6 +29,16 @@ public class AppConfig {
 
     @Value("${trust.store.password}")
     private String trustStorePassword;
+
+    @Bean
+    public JwtTokenInterceptor jwtTokenInterceptor() {
+        return new JwtTokenInterceptor(jwtTokenExtractor());
+    }
+
+    @Bean
+    public JwtTokenExtractor jwtTokenExtractor() {
+        return new JwtTokenExtractor();
+    }
 
     @Bean
     public RestTemplate restTemplate() throws KeyManagementException, NoSuchAlgorithmException,
@@ -40,6 +51,8 @@ public class AppConfig {
                 .build();
         CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(cm).build();
         ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-        return new RestTemplate(requestFactory);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        restTemplate.setInterceptors(Collections.singletonList(jwtTokenInterceptor()));
+        return restTemplate;
     }
 }

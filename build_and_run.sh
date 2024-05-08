@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Running Maven clean..."
+mvn clean
+
 echo "Running Maven package..."
 mvn package
 
@@ -19,5 +22,5 @@ fi
 echo "Starting services with Docker Compose..."
 docker-compose up -d
 
-# Add command to keep the window open
+# Added this command to keep the window open
 read -p "Press Enter to exit"

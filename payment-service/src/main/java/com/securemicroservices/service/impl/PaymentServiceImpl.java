@@ -142,10 +142,6 @@ public class PaymentServiceImpl implements PaymentService {
         return getConfirmation(GATEWAY_SERVICE_URL + "/orders/{orderId}/release", orderId);
     }
 
-    /*private boolean validateOrder(Long orderId) {
-        return getConfirmation(ORDER_SERVICE_URL + "/orders/{orderId}/validate", orderId);
-    }*/
-
     private boolean getConfirmation(String url, Long insertedValue) {
         try {
             ResponseEntity<Boolean> response = restTemplate.exchange(

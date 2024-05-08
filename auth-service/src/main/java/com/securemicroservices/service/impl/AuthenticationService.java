@@ -1,4 +1,4 @@
-package com.securemicroservices.service;
+package com.securemicroservices.service.impl;
 
 import com.securemicroservices.dto.AuthenticationResponse;
 import com.securemicroservices.dto.LoginRequest;
@@ -6,6 +6,7 @@ import com.securemicroservices.dto.RegistrationRequest;
 import com.securemicroservices.dto.UserDTO;
 import com.securemicroservices.entity.Role;
 import com.securemicroservices.entity.User;
+import com.securemicroservices.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
