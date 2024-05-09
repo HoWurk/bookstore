@@ -1,6 +1,9 @@
 package com.securemicroservices.config;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -38,22 +41,6 @@ public class JwtUtil {
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException | ExpiredJwtException e) {
             return true;
         }
-    }
-
-    public String extractUsername(String token) {
-        return extractClaims(token).getSubject();
-    }
-
-    public Date extractExpirationDate(String token) {
-        return extractClaims(token).getExpiration();
-    }
-
-    private Claims extractClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
     }
 
 }

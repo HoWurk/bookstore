@@ -18,7 +18,7 @@ public class GatewayConfig {
                 .route("app_route", r -> r.path("/books/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://app:8080"))
-                .route("auth_route", r -> r.path("/auth/**").or().path("/users/**")
+                .route("auth_route", r -> r.path("/auth/**").or().path("/users/**").and().not(p -> p.path("/auth/logout"))
                         .filters(f -> f.filter(filter))
                         .uri("http://auth-service:8080"))
                 .route("order_route", r -> r.path("/orders/**").or().path("/order-items/**")

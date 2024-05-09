@@ -1,6 +1,7 @@
 package com.securemicroservices.config;
 
 
+import com.securemicroservices.blacklisting.JwtTokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -24,6 +25,7 @@ public class JwtFilter implements GatewayFilter {
 
     private final RouterValidator routerValidator;
     private final JwtUtil jwtUtil;
+    private final JwtTokenService jwtTokenService;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -33,7 +35,7 @@ public class JwtFilter implements GatewayFilter {
         if (routerValidator.isSecured.test(request)) {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 String jwt = authorizationHeader.substring(7);
-                if (jwtUtil.isInvalid(jwt)) {
+                if (jwtUtil.isInvalid(jwt) || jwtTokenService.isTokenBlacklisted(jwt)) {
                     return onError(exchange, HttpStatus.FORBIDDEN, "JWT token is expired or invalid.");
                 }
             } else {
