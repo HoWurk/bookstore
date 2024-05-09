@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -38,6 +41,10 @@ public class JwtUtil {
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException | ExpiredJwtException e) {
             return true;
         }
+    }
+
+    public Set<String> extractRoles(String token) {
+        return Arrays.stream(extractClaims(token).get("roles", String.class).split(",")).collect(Collectors.toSet());
     }
 
     public String extractUsername(String token) {

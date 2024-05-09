@@ -1,6 +1,7 @@
 package com.securemicroservices.config;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -9,10 +10,13 @@ import org.springframework.http.client.ClientHttpResponse;
 
 import java.io.IOException;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class JwtTokenInterceptor implements ClientHttpRequestInterceptor {
 
-    private JwtTokenExtractor jwtTokenExtractor;
+    private final JwtTokenExtractor jwtTokenExtractor;
+
+    @Value("${secret.shared}")
+    private String sharedSecret;
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
@@ -20,6 +24,9 @@ public class JwtTokenInterceptor implements ClientHttpRequestInterceptor {
         if (jwtToken != null) {
             request.getHeaders().add(HttpHeaders.AUTHORIZATION, jwtToken);
         }
+
+        request.getHeaders().add("X-SHARED-SECRET", sharedSecret);
+
         return execution.execute(request, body);
     }
 }
