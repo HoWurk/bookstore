@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -28,6 +29,9 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     public void blacklistToken(String token, String username, Date expirationDate) {
+        if (jwtTokenRepository.findByToken(token).isPresent()) {
+            return;
+        }
         JwtToken jwtToken = JwtToken.builder()
                 .token(token)
                 .username(username)
@@ -38,8 +42,8 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     public boolean isTokenBlacklisted(String token) {
-        JwtToken jwtToken = jwtTokenRepository.findByToken(token);
-        return jwtToken != null;
+        Optional<JwtToken> jwtToken = jwtTokenRepository.findByToken(token);
+        return jwtToken.isPresent();
     }
 
     @Scheduled(fixedRate = 24 * 60 * 60 * 1000)
