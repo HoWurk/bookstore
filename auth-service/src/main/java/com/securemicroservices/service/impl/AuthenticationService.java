@@ -31,6 +31,7 @@ public class AuthenticationService {
     private final HttpServletRequest request;
 
     private final LoadingCache<String, Integer> attemptsCache;
+    private final LoadingCache<String, Integer> loginAttempts;
     private static final int MAX_ATTEMPT = 5;
 
     @Autowired
@@ -40,7 +41,12 @@ public class AuthenticationService {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.request = request;
-        attemptsCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.DAYS).build(new CacheLoader<>() {
+        attemptsCache = createLoadingCache();
+        loginAttempts = createLoadingCache();
+    }
+
+    private static LoadingCache<String, Integer> createLoadingCache() {
+        return CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.DAYS).build(new CacheLoader<>() {
             @Override
             public Integer load(final String key) {
                 return 0;
@@ -91,6 +97,17 @@ public class AuthenticationService {
         attemptsCache.put(key, attempts);
     }
 
+    public void logUsernameAttempt(String username) {
+        int attempts;
+        try {
+            attempts = loginAttempts.get(username);
+        } catch (final ExecutionException e) {
+            attempts = 0;
+        }
+        attempts++;
+        loginAttempts.put(username, attempts);
+    }
+
     public boolean isBlocked() {
         try {
             return attemptsCache.get(getClientIP()) >= MAX_ATTEMPT;
@@ -107,7 +124,10 @@ public class AuthenticationService {
         } else {
             ipAddress = ipAddress.split(",")[0].trim();
         }
-//        String ipAddress = request.getHeader("Client-IP");
         return ipAddress;
+    }
+
+    public LoadingCache<String, Integer> getLoginAttempts() {
+        return loginAttempts;
     }
 }

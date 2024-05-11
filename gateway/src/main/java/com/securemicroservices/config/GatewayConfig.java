@@ -22,8 +22,6 @@ import static java.time.Duration.ofSeconds;
 public class GatewayConfig {
 
     private final JwtFilter filter;
-//    private final JwtUtil jwtUtil;
-//    private static final Logger logger = LoggerFactory.getLogger(GatewayConfig.class);
 
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
@@ -34,6 +32,10 @@ public class GatewayConfig {
                                         .setRateLimiter(rateLimiter())
                                         .setKeyResolver(keyResolver())))
                         .uri("http://app:8080"))
+                .route("auth_actuator", r -> r.path("/auth/actuator/**")
+                        .filters(f -> f.rewritePath("/auth/(?<remaining>.*)", "/${remaining}")
+                                .filter(filter))
+                        .uri("http://auth-service:8080"))
                 .route("auth_route", r -> r.path("/auth/**").or().path("/users/**").and().not(p -> p.path("/auth/logout"))
                         .filters(f -> f.filter(filter)
                                 .modifyRequestBody(String.class, String.class, GatewayConfig::extractIpAddress)
@@ -58,30 +60,10 @@ public class GatewayConfig {
     }
 
     private static Mono<String> extractIpAddress(ServerWebExchange exchange, String body) {
-        String ipAddress = exchange.getRequest()
-                .getHeaders().getFirst("X-Forwarded-For");
+        String ipAddress = extractIpFromRequest(exchange.getRequest());
 
-        if (ipAddress == null || ipAddress.isEmpty()) {
-            InetSocketAddress remoteAddress = exchange.getRequest()
-                    .getRemoteAddress();
-            if (remoteAddress != null) {
-                ipAddress = remoteAddress.getAddress().getHostAddress();
-            }
-        } else {
-            ipAddress = ipAddress.split(",")[0].trim();
-        }
+        mutateHeaders(exchange, ipAddress);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.addAll(exchange.getRequest().getHeaders());
-        headers.set("Client-IP", ipAddress);
-
-        ServerHttpRequest request = exchange.getRequest().mutate()
-                .headers(httpHeaders -> httpHeaders.addAll(headers))
-                .build();
-
-        exchange.mutate().request(request).build();
-
-        System.out.println(exchange.getRequest().getHeaders());
         return Mono.just(body);
     }
 
@@ -95,19 +77,36 @@ public class GatewayConfig {
         return exchange -> {
             ServerHttpRequest request = exchange.getRequest();
 
-            String ipAddress = request.getHeaders().getFirst("X-Forwarded-For");
-
-            if (ipAddress == null || ipAddress.isEmpty()) {
-                InetSocketAddress remoteAddress = request.getRemoteAddress();
-
-                if (remoteAddress != null) {
-                    ipAddress = remoteAddress.getAddress().getHostAddress();
-                }
-            } else {
-                ipAddress = ipAddress.split(",")[0].trim();
-            }
+            String ipAddress = extractIpFromRequest(request);
 
             return Mono.just(Objects.requireNonNull(ipAddress));
         };
+    }
+
+    private static void mutateHeaders(ServerWebExchange exchange, String ipAddress) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.addAll(exchange.getRequest().getHeaders());
+        headers.set("Client-IP", ipAddress);
+
+        ServerHttpRequest request = exchange.getRequest().mutate()
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .build();
+
+        exchange.mutate().request(request).build();
+    }
+
+    private static String extractIpFromRequest(ServerHttpRequest request) {
+        String ipAddress = request.getHeaders().getFirst("X-Forwarded-For");
+
+        if (ipAddress == null || ipAddress.isEmpty()) {
+            InetSocketAddress remoteAddress = request.getRemoteAddress();
+
+            if (remoteAddress != null) {
+                ipAddress = remoteAddress.getAddress().getHostAddress();
+            }
+        } else {
+            ipAddress = ipAddress.split(",")[0].trim();
+        }
+        return ipAddress;
     }
 }

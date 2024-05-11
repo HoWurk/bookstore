@@ -69,7 +69,7 @@ public class JwtFilter implements GatewayFilter {
         HttpMethod method = request.getMethod();
 
         // auth-service
-        if (path.startsWith("/users")) {
+        if (path.startsWith("/users") || path.startsWith("/auth/actuator")) {
             if (!userRoles.contains("ROLE_ADMIN")) {
                 return onError(exchange, HttpStatus.UNAUTHORIZED, "Not Authorized");
             }

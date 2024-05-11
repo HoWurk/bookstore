@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,6 +20,9 @@ public class AuthenticationFailureListener implements
 
     @Override
     public void onApplicationEvent(@NonNull AuthenticationFailureBadCredentialsEvent e) {
+        Authentication authentication = e.getAuthentication();
+        String username = (String) authentication.getPrincipal();
+
         String ipAddress = request.getHeader("X-Forwarded-For");
 
         if (ipAddress == null || ipAddress.isEmpty()) {
@@ -27,5 +31,6 @@ public class AuthenticationFailureListener implements
             ipAddress = ipAddress.split(",")[0].trim();
         }
         authenticationService.loginFailed(ipAddress);
+        authenticationService.logUsernameAttempt(username);
     }
 }
