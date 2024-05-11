@@ -38,7 +38,6 @@ public class GatewayConfig {
                         .uri("http://auth-service:8080"))
                 .route("auth_route", r -> r.path("/auth/**").or().path("/users/**").and().not(p -> p.path("/auth/logout"))
                         .filters(f -> f.filter(filter)
-                                .modifyRequestBody(String.class, String.class, GatewayConfig::extractIpAddress)
                                 .requestRateLimiter(rateLimiter -> rateLimiter
                                         .setRateLimiter(rateLimiter())
                                         .setKeyResolver(keyResolver())))
