@@ -2,7 +2,7 @@ CREATE TABLE books
 (
     id                 SERIAL PRIMARY KEY,
     title              VARCHAR(255)     NOT NULL,
-    author             VARCHAR(255)     NOT NULL,
+    author             VARCHAR(200)     NOT NULL,
     description        TEXT             NOT NULL,
     isbn               VARCHAR(20)      NOT NULL,
     price              DOUBLE PRECISION NOT NULL,

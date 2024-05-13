@@ -4,8 +4,8 @@ CREATE TABLE payments
     order_id       BIGINT           NOT NULL,
     payment_date   TIMESTAMP,
     amount         DOUBLE PRECISION NOT NULL,
-    payment_method VARCHAR(255),
-    status         VARCHAR(255)     NOT NULL
+    payment_method VARCHAR(50),
+    status         VARCHAR(50)      NOT NULL
 );
 
 INSERT INTO payments (order_id, payment_date, amount, payment_method, status)
